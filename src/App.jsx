@@ -1,49 +1,49 @@
 import { useEffect, useState } from "react"
 import './App.css'
+import { getRandomFact } from "./Services/facts"
 
 
 const CAT_ENDPOINT_RANDOM_FACT = `https://catfact.ninja/fact`
-//const   CAT_ENDPOINT_IMAGE_URL = `https://cataas.com/cat/says/${firstWord}?fontSize=50&fontColor=red&json=true`
+//const   CAT_ENDPOINT_IMAGE_URL = `https://cataas.com/cat/says/${firstWord}?fontSize=50&fontColor=red&/cat?json=true`
 const PREFIX_URL = `https://cataas.com`
 
-
-
-export function App () {
-    const [fact, setFact] = useState()
+function useCatImage ({fact}) {
     const [imgCat, setImgCat] = useState()
-    const [factError, setFactError] = useState()
-   
     
-    useEffect(() =>{
-        fetch(CAT_ENDPOINT_RANDOM_FACT)
-        .then(res =>{
-            if (!res.ok){
-                setFactError('No se ha podido recuperar la cita')
-            }
-            return res.json()})
-        .then(data =>{
-            const { fact } = data
-            setFact(fact)
-        })
-    }, [])
-
     useEffect(()=>{
         if(!fact)return
-        const firstThreeWords = fact.split(' ',3 ).join(' ');
-        fetch(`https://cataas.com/cat/says/${firstThreeWords}?fontSize=50&fontColor=red&json=true`)
+        const firstThreeWords = fact.split(' ')[0];
+        
+        fetch(`https://cataas.com/cat/says/${firstThreeWords}?&Size=50&color=red&json=true`)
         .then(res =>  res.json())
-        .then(response =>{
+        .then(response => {     
            const { url } = response
-           setImgCat( url )
+           setImgCat( url )   
            
         })  
     },[fact])
 
+    return { imgCat }
+}
+
+
+export function App () {
+    const [fact, setFact] = useState()
+    const { imgCat } = useCatImage({fact})
     
+    useEffect(()=>{
+        getRandomFact().then(setFact)
+    },[])
+
+    const hadleClick = ()=>{
+        getRandomFact().then(setFact)    
+    }
+
 
     return (
         <main>
         <h1>App de gatitos</h1>
+        <button onClick={hadleClick}>Get new fact</button>
         {fact&&<p>{fact}</p>}
         <img src={`${PREFIX_URL}${imgCat}`} alt=
         {`Image extracted using the firs three words from ${fact}`}></img>
