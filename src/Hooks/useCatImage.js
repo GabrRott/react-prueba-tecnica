@@ -6,16 +6,15 @@ export function useCatImage ({fact}) {
     
     useEffect(()=>{
         if(!fact)return
-        const firstThreeWords = fact.split(' ')[0];
-        
-        fetch(`https://cataas.com/cat/says/${firstThreeWords}?&Size=50&color=red&json=true`)
-        .then(res =>  res.json())
-        .then(response => {     
-           const { url } = response
+        const threeFirstWords = fact.split(' ', 3).join(' ')
+
+        fetch(`https://cataas.com/cat/says/${threeFirstWords}?size=50&color=red`)
+        .then(() => {
+           const url  = `/cat/says/${threeFirstWords}?size=50&color=red`
            setImgCat( url )   
            
         })  
     },[fact])
 
-    return { imgCat: `${PREFIX_URL}` }
+    return { imgCat: `${PREFIX_URL}${imgCat}` }
 }
